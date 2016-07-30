@@ -45,9 +45,37 @@ void ComputeDCT_2(const DoubleArray inVector,DoubleArray &outVector,int inIndexU
  */
 void ComputeInverseDCT_2(const DoubleArray inVector,DoubleArray &outVector,int inIndexUpto = -1);
 
+void dct_ii(int N, const DoubleArray x, DoubleArray & X)
+{
+	X.resize(x.size(),0.0);
+	
+	for (int k = 0; k < N; ++k) {
+		double sum = 0.;
+		double s = (k == 0) ? sqrt(.5) : 1.;
+		for (int n = 0; n < N; ++n) {
+			sum += s * x[n] * cos(M_PI * (n + .5) * k / N);
+		}
+		X[k] = sum * sqrt(2. / N);
+	}
+}
+
 int main(int argc, const char * argv[]) {
-	// insert code here...
-	std::cout << "Hello, World!\n";
+	
+	DoubleArray array;
+	for(int i = 0; i < 4; ++i )
+	{
+		array.push_back(1.0);
+	}
+	
+	DoubleArray dctValues;
+	DoubleArray inverseDCTValues;
+	
+	dct_ii(4,array, dctValues);
+	
+	
+	ComputeDCT_2(array, dctValues );
+	ComputeInverseDCT_2(dctValues, inverseDCTValues);
+	
     return 0;
 }
 
@@ -65,7 +93,7 @@ void ComputeDCT_1(const DoubleArray inVector,DoubleArray &outVector,int nIndexUp
 	outVector.resize(nSize,0.0);
 	
 	
-	for(int i = 0; i < nSize, i < nIndexUpto ; ++i )
+	for(int i = 0; i < nSize && i < nIndexUpto ; ++i )
 	{
 		double x = inVector[i] + std::pow(1.0,i) * inVector[nSize - 1] ;
 		
@@ -74,7 +102,7 @@ void ComputeDCT_1(const DoubleArray inVector,DoubleArray &outVector,int nIndexUp
 			x += inVector[j] *  std::cos( (M_PI /(nSize - 1)  ) *  j * i );
 		}
 		
-		outVector.push_back(x);
+		outVector[i] = x;
 	}
 }
 
@@ -84,7 +112,9 @@ void ComputeDCT_2(const DoubleArray inVector,DoubleArray &outVector,int nIndexUp
 	
 	int nSize = inVector.size();
 	
-	double  scaleFactor = 1.0 / std::sqrt(2.0);
+	outVector.resize(nSize,0.0);
+	
+	double  scaleFactor = std::sqrt(0.5);
 	
 	if ( nIndexUpto <= 0 || nIndexUpto  >= nSize )
 	{
@@ -94,7 +124,7 @@ void ComputeDCT_2(const DoubleArray inVector,DoubleArray &outVector,int nIndexUp
 	outVector.resize(nSize,0.0);
 	
 	
-	for(int i = 0; i < nSize, i < nIndexUpto ; ++i )
+	for(int i = 0; i < nSize && i < nIndexUpto ; ++i )
 	{
 		double x = 0;
 	
@@ -106,9 +136,9 @@ void ComputeDCT_2(const DoubleArray inVector,DoubleArray &outVector,int nIndexUp
 		if ( i ==  0 )
 			x *= scaleFactor;
 		
-		x *= 2/nSize;
+		x *= std::sqrt( 2.0/nSize );
 		
-		outVector.push_back(x);
+		outVector[i] = x;
 	}
 }
 
@@ -117,6 +147,8 @@ void ComputeInverseDCT_2(const DoubleArray inVector,DoubleArray &outVector,int n
 {
 	
 	int nSize = inVector.size();
+	
+	outVector.resize(nSize,0.0);
 	
 	double  scaleFactor = 1.0 / std::sqrt(2.0);
 	
@@ -129,7 +161,7 @@ void ComputeInverseDCT_2(const DoubleArray inVector,DoubleArray &outVector,int n
 	
 	double Ck = 0.0;
 	
-	for(int i = 0; i < nSize, i < nIndexUpto ; ++i )
+	for(int i = 0; i < nSize && i < nIndexUpto ; ++i )
 	{
 		double x = 0;
 		
@@ -144,10 +176,9 @@ void ComputeInverseDCT_2(const DoubleArray inVector,DoubleArray &outVector,int n
 			x += Ck * inVector[j] *  std::cos( (M_PI /nSize) * ( j + 0.5 ) * i );
 		}
 		
-		x *= 2/nSize;
+		x *= std::sqrt( 2.0/nSize );
 		
-		
-		outVector.push_back(x);
+		outVector[i] = x;
 	}
 }
 
